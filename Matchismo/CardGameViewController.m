@@ -14,7 +14,8 @@
 @interface CardGameViewController ()
 @property (weak, nonatomic) IBOutlet UILabel *flipsLabel;
 @property (nonatomic) int flipCount;
-@property (strong, nonatomic) Deck *deck;
+@property (nonatomic) Deck *deck;
+@property (nonatomic) int initialCount;
 @end
 
 @implementation CardGameViewController
@@ -22,8 +23,14 @@
 {
     if (!_deck) {
         _deck = [[PlayingCardDeck alloc] init];
+        _initialCount = [_deck count];
     }
     return _deck;
+}
+
+- (void)setInitialCount:(int)initialCount
+{
+    _initialCount = initialCount;
 }
 
 - (void)setFlipCount:(int)flipCount
@@ -35,8 +42,11 @@
 
 - (IBAction)touchCardButton:(UIButton *)sender
 {
-    if (self.flipCount > 52) {
-        //Do something here to show all cards have been flipped
+    if (self.flipCount > self.initialCount) {
+        //Show green background image when cards exhausted
+        [sender setBackgroundImage:[UIImage imageNamed:@"green"]
+                          forState:UIControlStateNormal];
+        [sender setTitle:@"" forState:UIControlStateNormal];
     } else if ([sender.currentTitle length]) {
         [sender setBackgroundImage:[UIImage imageNamed:@"cardback"]
                           forState:UIControlStateNormal];
@@ -44,9 +54,7 @@
     } else {
         [sender setBackgroundImage:[UIImage imageNamed:@"cardfront"]
                           forState:UIControlStateNormal];
-        NSLog(@"Count of deck = %d", [self.deck count]);
         Card *card = [self.deck drawRandomCard];
-        NSLog(@"Contents = %@", card.contents);
         [sender setTitle:card.contents forState:UIControlStateNormal];
     }
     self.flipCount++;
